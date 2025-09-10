@@ -116,12 +116,14 @@ export const SimpleTable = ({ pageSize = 20 }: SimpleTableProps) => {
   }, [loading, items?.length || 0, totalItems, currentPage, initialized]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+    const value = e.target.value;
+    setSearchTerm(value);
+    setItems([]);
+    setCurrentPage(1);
+    setInitialized(false); 
   };
 
-  const filteredItems = items.filter((item) =>
-    item.value.toString().includes(searchTerm)
-  );
+
 
   const toggleItemSelection = useCallback((itemId: number) => {
     setSelectedItems((prev) => {
@@ -144,7 +146,7 @@ export const SimpleTable = ({ pageSize = 20 }: SimpleTableProps) => {
   const handleSelectAll = useCallback(async () => {
     try {
       const response = await itemsApi.saveSelected(
-        filteredItems.map((item) => item.id)
+        items.map((item) => item.id)
       );
       if (response.data?.data?.selected) {
         setSelectedItems(new Set(response.data.data.selected));
@@ -152,7 +154,7 @@ export const SimpleTable = ({ pageSize = 20 }: SimpleTableProps) => {
     } catch (error) {
       console.error("Failed to save all selected items:", error);
     }
-  }, [filteredItems]);
+  }, [items]);
 
   const handleClearSelection = useCallback(async () => {
     try {
@@ -171,7 +173,7 @@ export const SimpleTable = ({ pageSize = 20 }: SimpleTableProps) => {
     const sourceIndex = result.source.index;
     const destinationIndex = result.destination.index;
 
-    const newItems = Array.from(filteredItems);
+    const newItems = Array.from(items);
     const [reorderedItem] = newItems.splice(sourceIndex, 1);
     newItems.splice(destinationIndex, 0, reorderedItem);
 
@@ -241,7 +243,7 @@ export const SimpleTable = ({ pageSize = 20 }: SimpleTableProps) => {
               {loading && items.length === 0 ? (
                 <div className={styles.loadingRow}>Загрузка...</div>
               ) : (
-                filteredItems.map((item, index) => (
+                items.map((item, index) => (
                   <Draggable
                     key={item.id.toString()}
                     draggableId={item.id.toString()}
