@@ -12,7 +12,6 @@ console.log(
   "API Version Check - Deploy Time: 2025-09-09 " + new Date().toISOString()
 );
 
-//build
 export const itemsApi = {
   getItems: async (options: {
     page: number;

@@ -1,78 +1,74 @@
 .wrapper {
-    padding: 20px;
-    max-width: 800px;
-    margin: 0 auto;
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .title {
-    font-size: 24px;
-    margin-bottom: 20px;
-    color: #1a1a1a;
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #1a1a1a;
 }
 
-
-
 .info {
-    font-size: 14px;
-    color: #5f6368;
-    margin-bottom: 16px;
+  font-size: 14px;
+  color: #5f6368;
+  margin-bottom: 16px;
 }
 
 .tableContainer {
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    overflow: auto;
-    height: 600px;
-    /* background-color: white; */
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: auto;
+  height: 600px;
 }
 
 .row {
-    display: flex;
-    align-items: center;
-    padding: 8px 16px;
-    background-color: white;
-    border-bottom: 1px solid #eee;
-    min-height: 35px;
-    user-select: none;
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  background-color: white;
+  border-bottom: 1px solid #eee;
+  min-height: 35px;
+  user-select: none;
 }
 
 .row:hover {
-    background-color: #f8f9fa;
+  background-color: #f8f9fa;
 }
 
 .row.isDragging {
-    background-color: #e8f0fe;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: #e8f0fe;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .checkbox {
-    margin-right: 12px;
-    width: 18px;
-    height: 18px;
+  margin-right: 12px;
+  width: 18px;
+  height: 18px;
 }
 
 .dragHandle {
-    margin-left: auto;
-    cursor: grab;
-    padding: 8px;
-    color: #5f6368;
-    font-size: 18px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    user-select: none;
+  margin-left: auto;
+  cursor: grab;
+  padding: 8px;
+  color: #5f6368;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
 }
 
 .dragHandle:active {
-    cursor: grabbing;
+  cursor: grabbing;
 }
 
 .loadingRow {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 16px;
-    color: #5f6368;
-    /* background-color: #fafafa; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  color: #5f6368;
 }
