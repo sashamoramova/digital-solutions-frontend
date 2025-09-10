@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import type { DropResult } from "@hello-pangea/dnd";
 import { type Item } from "@/shared/types/item";
+import { type RootState } from "@/app/store/store";
 import { itemsApi } from "@/entities/item/api";
+import { TableHeader } from "./TableHeader";
 import styles from "./virtual-table.module.css";
 
 interface SimpleTableProps {
@@ -12,18 +15,19 @@ interface SimpleTableProps {
 export const SimpleTable = ({ pageSize = 20 }: SimpleTableProps) => {
   const [items, setItems] = useState<Item[]>([]);
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
-  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const searchTerm = useSelector(
+    (state: RootState) => state.search.searchQuery
+  );
   const [initialized, setInitialized] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const loadItems = async (page: number) => {
+  const loadItems = async (page: number, isNewSearch: boolean = false) => {
     if (loading) return;
 
     try {
-      // console.log('Loading items for page:', page);
       setLoading(true);
       const [itemsResponse, stateResponse] = await Promise.all([
         itemsApi.getItems({ page, limit: pageSize, term: searchTerm }),
@@ -57,7 +61,10 @@ export const SimpleTable = ({ pageSize = 20 }: SimpleTableProps) => {
           }
         }
 
-        setItems((prev) => (page === 1 ? newItems : [...prev, ...newItems]));
+        setItems((prev) => {
+          if (isNewSearch) return newItems;
+          return page === 1 ? newItems : [...prev, ...newItems];
+        });
         setTotalItems(itemsResponse.data.data.total);
         setCurrentPage(page);
       }
@@ -74,14 +81,6 @@ export const SimpleTable = ({ pageSize = 20 }: SimpleTableProps) => {
 
       try {
         setLoading(true);
-
-        const stateResponse = await itemsApi.getState();
-        if (stateResponse.data?.data) {
-          if (stateResponse.data.data.selected) {
-            setSelectedItems(new Set(stateResponse.data.data.selected));
-          }
-        }
-
         await loadItems(1);
         setInitialized(true);
       } catch (error) {
@@ -115,15 +114,10 @@ export const SimpleTable = ({ pageSize = 20 }: SimpleTableProps) => {
     return () => container.removeEventListener("scroll", handleScroll);
   }, [loading, items?.length || 0, totalItems, currentPage, initialized]);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-    setItems([]);
+  useEffect(() => {
     setCurrentPage(1);
-    setInitialized(false); 
-  };
-
-
+    loadItems(1, true);
+  }, [searchTerm]);
 
   const toggleItemSelection = useCallback((itemId: number) => {
     setSelectedItems((prev) => {
@@ -206,25 +200,10 @@ export const SimpleTable = ({ pageSize = 20 }: SimpleTableProps) => {
   return (
     <div className={styles.wrapper}>
       <h1 className={styles.title}>Менеджер элементов</h1>
-      <div className={styles.header}>
-        <div className={styles.searchBox}>
-          <input
-            type="text"
-            placeholder="Поиск элементов..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className={styles.searchInput}
-          />
-        </div>
-        <div className={styles.actions}>
-          <button onClick={handleSelectAll} className={styles.button}>
-            Выбрать все
-          </button>
-          <button onClick={handleClearSelection} className={styles.button}>
-            Очистить выбор
-          </button>
-        </div>
-      </div>
+      <TableHeader 
+        onSelectAll={handleSelectAll}
+        onClearSelection={handleClearSelection}
+      />
       <div className={styles.info}>
         Показано {items?.length || 0} из {totalItems} элементов • Выбрано:{" "}
         {selectedItems.size}
@@ -245,7 +224,7 @@ export const SimpleTable = ({ pageSize = 20 }: SimpleTableProps) => {
               ) : (
                 items.map((item, index) => (
                   <Draggable
-                    key={item.id.toString()}
+                    key={`${item.id}-${index}`}
                     draggableId={item.id.toString()}
                     index={index}
                   >

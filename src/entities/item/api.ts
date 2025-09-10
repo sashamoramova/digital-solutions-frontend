@@ -23,7 +23,7 @@ export const itemsApi = {
       params: {
         page: options.page,
         limit: options.limit || 20,
-        search: options.term || "",
+        term: options.term || "",
       },
     });
     return {
